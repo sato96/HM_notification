@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "HM_notification"
+version = "0.1.0"
+description = ""
+authors = ["sato96 <samtozzi.st@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "HM_notification", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+HM_requests = { git = "https://github.com/sato96/HM_requests.git", branch = "main"}
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/HM_notification"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
