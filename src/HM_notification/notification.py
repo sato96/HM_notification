@@ -42,6 +42,9 @@ class Msg(object):
         msg._video = msg_data.get('video')
         msg._text = msg_data.get('text')
         msg._data = msg_data.get('data')
+        msg._flToSender = data.get('flToSender', False)
+        msg._sender = data.get('sender')
+        msg._service = data.get('serviceAlert')
         
         return msg
     
