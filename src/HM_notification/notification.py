@@ -192,6 +192,6 @@ class Msg(object):
         else:
             topic = topic if topic.startswith("/") else "/" + topic
         payload = self.to_json()
-        url = "mqtt://" + urlparse(self._broker).hostname + ":" + str(urlparse(self._broker).port) + topic
-        req = Request.post(url, payload=payload, topic = topic)
+        url = "mqtt://" + urlparse(self._broker).hostname + ":" + str(urlparse(self._broker).port)
+        req = Request.post(url, payload=payload, topic=topic)
         return req
