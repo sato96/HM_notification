@@ -4,8 +4,24 @@ from urllib.parse import urlparse
 from HM_requests import Request
 
 class Msg(object):
-    #TODO create obj from json or dict
-    def __init__(self, service, urlBroker, topicDef=None, imgPath=None, videoPath=None, text=None, data=None, sender = None, flToSender=False):
+    ## Constructor
+    """
+    Message structure:
+    {
+        "serviceAlert": self._service,    # Service identifier for the alert
+        "msg": {
+            "img": self._img,            # Base64 encoded image if present
+            "video": self._video,        # Base64 encoded video if present
+            "text": self._text,          # Text message content
+            "data": self._data           # Additional custom data payload
+        },
+        "sender": self._sender,          # Identifier of the message sender
+        "flToSender": self._flToSender,  # Flag indicating if response should be sent back to sender
+        "msgType": self._msgType         # Type of message (e.g., "text", "image", "video")
+    }
+    """
+
+    def __init__(self, service, urlBroker, topicDef=None, imgPath=None, videoPath=None, text=None, data=None, sender = None, flToSender=False, msgType=None):
         self._broker = urlBroker
         self._topicDef = topicDef if topicDef is not None else "/alert"
         self._topicDef = self._topicDef if self._topicDef.startswith("/") else "/" + self._topicDef
@@ -16,6 +32,7 @@ class Msg(object):
         self._data = data
         self._flToSender = flToSender
         self._sender = sender
+        self._msgType = msgType if msgType is not None else "text"
 
     @classmethod
     def from_dict(cls, data, urlBroker, topicDef=None):
@@ -45,6 +62,7 @@ class Msg(object):
         msg._flToSender = data.get('flToSender', False)
         msg._sender = data.get('sender')
         msg._service = data.get('serviceAlert')
+        msg._msgType = data.get('msgType', 'text')
         
         return msg
     
@@ -68,7 +86,11 @@ class Msg(object):
     @property
     def broker(self):
         return self._broker
-    
+
+    @property
+    def msgType(self):
+        return self._msgType
+
     @property
     def topic_def(self):
         return self._topicDef
@@ -137,6 +159,10 @@ class Msg(object):
     def fl_to_sender(self, value):
         self._flToSender = value
 
+    @msgType.setter
+    def msgType(self, value):
+        self._msgType = value
+
     def to_dict(self):
             return {
                 "serviceAlert": self._service,
@@ -147,7 +173,8 @@ class Msg(object):
                     "data": self._data
                 },
                 "sender": self._sender,
-                "flToSender": self._flToSender
+                "flToSender": self._flToSender,
+                "msgType": self._msgType
             }
     
     def to_json(self):
@@ -166,5 +193,5 @@ class Msg(object):
             topic = topic if topic.startswith("/") else "/" + topic
         payload = self.to_json()
         url = "mqtt://" + urlparse(self._broker).hostname + ":" + str(urlparse(self._broker).port) + topic
-        req = Request.post(url, data=payload)
+        req = Request.post(url, payload=payload)
         return req
